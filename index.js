@@ -44,6 +44,18 @@ async function run() {
         const buyingCollection = client.db("outdoorFurniture").collection("buying");
         const usersCollection = client.db("outdoorFurniture").collection("users");
         
+        // Admin Middleware
+        const verifyAdmin = async (req, res, next) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next();
+        }
+
         app.get('/furniture', async (req, res) => {
             const query = {}
             const result = await furnitureCollection.find(query).toArray();
@@ -133,6 +145,19 @@ async function run() {
             const user = req.body;
             console.log(user);
             const result = await usersCollection.insertOne(user);
+            res.send(result);
+         });
+        
+         app.put('/users/admin/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
         });
 
