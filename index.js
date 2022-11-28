@@ -10,9 +10,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// user name: furnitureUserDB
-// password: NhhPyw1eLvqB6HAV
-// token = cd72ef4808a4718fe2400502aea9cdd97571339e0eb79f23bc48ff6f364feb7b3546c5fd9370acd707f6543092790de86da63fa3e7356d3034978c3135510e9f
 
 const uri = `mongodb+srv://${process.env.REACT_FURNITURE_USER}:${process.env.REACT_FURNITURE_PASSWORD}@cluster0.ik3p7tj.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
