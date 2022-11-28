@@ -43,6 +43,7 @@ async function run() {
         const allProductCollection = client.db("outdoorFurniture").collection("allProduct");
         const buyingCollection = client.db("outdoorFurniture").collection("buying");
         const usersCollection = client.db("outdoorFurniture").collection("users");
+        const addProductCollection = client.db("outdoorFurniture").collection("addProduct");
         
         // Admin Middleware
         const verifyAdmin = async (req, res, next) => {
@@ -51,6 +52,18 @@ async function run() {
             const user = await usersCollection.findOne(query);
 
             if (user?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next();
+        }
+
+        // Seller Middleware
+        const verifySeller = async (req, res, next) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+            if (user?.category!== 'Seller') {
                 return res.status(403).send({ message: 'forbidden access' })
             }
             next();
@@ -148,11 +161,32 @@ async function run() {
             res.send({ isAdmin: user?.role === 'admin' });
         })
 
+        // Seller API
         app.get('/users/seller/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
             res.send({ isSeller: user?.category === 'Seller' });
+        })
+
+        app.get('/seller/addProduct', verifyJWT, verifySeller, async (req, res) => {
+            const query = {};
+            const myProduct = await addProductCollection.find(query).toArray();
+            res.send(myProduct);
+        })
+
+        app.post('/seller/addProduct', verifyJWT, async (req, res) => {
+            const product = req.body;
+            console.log(product);
+            const result = await addProductCollection.insertOne(product);
+            res.send(result);
+        })
+
+        app.delete('/seller/addProduct/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await addProductCollection.deleteOne(filter);
+            res.send(result);
         })
 
         app.get('/users/buyer/:email', async (req, res) => {
