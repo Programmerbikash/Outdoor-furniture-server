@@ -155,6 +155,13 @@ async function run() {
             res.send({ isSeller: user?.category === 'Seller' });
         })
 
+        app.get('/users/buyer/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isBuyer: user?.category === 'User' });
+        })
+
          app.post('/users', async (req, res) => {
             const user = req.body;
             console.log(user);
