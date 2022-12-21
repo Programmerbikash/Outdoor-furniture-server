@@ -41,6 +41,8 @@ async function run() {
         const buyingCollection = client.db("outdoorFurniture").collection("buying");
         const usersCollection = client.db("outdoorFurniture").collection("users");
         const addProductCollection = client.db("outdoorFurniture").collection("addProduct");
+        const trandingCollection = client.db("outdoorFurniture").collection("tranding");
+        const newDesignCollection = client.db("outdoorFurniture").collection("newDesign");
         
         // Admin Middleware
         const verifyAdmin = async (req, res, next) => {
@@ -75,6 +77,18 @@ async function run() {
         app.get('/allProduct', async (req, res) => {
             const query = {}
             const result = await allProductCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        app.get('/trandingFurniture', async (req, res) => {
+            const query = {}
+            const result = await trandingCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        app.get('/newDesign', async (req, res) => {
+            const query = {}
+            const result = await newDesignCollection.find(query).toArray();
             res.send(result);
         })
 
